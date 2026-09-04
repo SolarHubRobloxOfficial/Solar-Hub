@@ -1,0 +1,214 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+
+if playerGui:FindFirstChild("SolarHubGui") then playerGui.SolarHubGui:Destroy() end
+
+-- === ЗАЩИТА: БЛОКИРОВКА УРОНА ОТ ПАДЕНИЯ ===
+local nc; nc = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    if method == "FireServer" and self.Name == "FallDamage" then
+        return nil -- Полностью блокируем отправку урона на сервер
+    end
+    return nc(self, ...)
+end)
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SolarHubGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 420, 0, 280)
+mainFrame.Position = UDim2.new(0.5, -210, 0.4, -140)
+mainFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Thickness = 2
+mainStroke.Color = Color3.fromRGB(255, 215, 0)
+mainStroke.Parent = mainFrame
+
+local mainCorner = Instance.new("UICorner") mainCorner.CornerRadius = UDim.new(0, 10) mainCorner.Parent = mainFrame
+
+local sideBar = Instance.new("Frame")
+sideBar.Size = UDim2.new(0, 120, 1, 0)
+sideBar.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+sideBar.BorderSizePixel = 0
+sideBar.Parent = mainFrame
+
+local sideCorner = Instance.new("UICorner") sideCorner.CornerRadius = UDim.new(0, 10) sideCorner.Parent = sideBar
+
+local sideHide = Instance.new("Frame")
+sideHide.Size = UDim2.new(0, 15, 1, 0)
+sideHide.Position = UDim2.new(1, -15, 0, 0)
+sideHide.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+sideHide.Parent = sideBar
+
+local logo = Instance.new("TextLabel")
+logo.Size = UDim2.new(1, 0, 0, 45)
+logo.BackgroundTransparency = 1
+logo.Text = "☀️ Solar Hub"
+logo.TextColor3 = Color3.fromRGB(255, 215, 0)
+logo.TextSize = 16
+logo.Font = Enum.Font.SourceSansBold
+logo.Parent = sideBar
+
+local tabMainBtn = Instance.new("TextButton")
+tabMainBtn.Size = UDim2.new(0, 105, 0, 35)
+tabMainBtn.Position = UDim2.new(0, 7, 0, 60)
+tabMainBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+tabMainBtn.Text = "  🏠 Main"
+tabMainBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+tabMainBtn.TextSize = 14
+tabMainBtn.Font = Enum.Font.SourceSansBold
+tabMainBtn.TextXAlignment = Enum.TextXAlignment.Left
+tabMainBtn.Parent = sideBar
+local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(0, 6) c1.Parent = tabMainBtn
+
+local tabOtherBtn = Instance.new("TextButton")
+tabOtherBtn.Size = UDim2.new(0, 105, 0, 35)
+tabOtherBtn.Position = UDim2.new(0, 7, 0, 105)
+tabOtherBtn.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+tabOtherBtn.Text = "  ⚙️ Other"
+tabOtherBtn.TextColor3 = Color3.fromRGB(160, 160, 160)
+tabOtherBtn.TextSize = 14
+tabOtherBtn.Font = Enum.Font.SourceSansBold
+tabOtherBtn.TextXAlignment = Enum.TextXAlignment.Left
+tabOtherBtn.Parent = sideBar
+local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 6) c2.Parent = tabOtherBtn
+
+local watermark = Instance.new("TextLabel")
+watermark.Size = UDim2.new(1, 0, 0, 25)
+watermark.Position = UDim2.new(0, 0, 1, -25)
+watermark.BackgroundTransparency = 1
+watermark.Text = "made by w1zzy666"
+watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
+watermark.TextTransparency = 0.5
+watermark.TextSize = 11
+watermark.Font = Enum.Font.SourceSansItalic
+watermark.Parent = sideBar
+
+local container = Instance.new("Frame")
+container.Size = UDim2.new(1, -120, 1, 0)
+container.Position = UDim2.new(0, 120, 0, 0)
+container.BackgroundTransparency = 1
+container.Parent = mainFrame
+
+local pageMain = Instance.new("Frame") pageMain.Size = UDim2.new(1, 0, 1, 0) pageMain.BackgroundTransparency = 1; pageMain.Parent = container
+local pageOther = Instance.new("Frame") pageOther.Size = UDim2.new(1, 0, 1, 0) pageOther.BackgroundTransparency = 1; pageOther.Visible = false; pageOther.Parent = container
+
+local mainHeader = Instance.new("TextLabel") mainHeader.Size = UDim2.new(1, 0, 0, 45) mainHeader.BackgroundTransparency = 1; mainHeader.Text = "Main Functions" mainHeader.TextColor3 = Color3.fromRGB(255, 255, 255) mainHeader.TextSize = 16 mainHeader.Font = Enum.Font.SourceSansBold mainHeader.Parent = pageMain
+local otherHeader = Instance.new("TextLabel") otherHeader.Size = UDim2.new(1, 0, 0, 50) otherHeader.BackgroundTransparency = 1; otherHeader.Text = "Other Tools" otherHeader.TextColor3 = Color3.fromRGB(255, 255, 255) otherHeader.TextSize = 16 otherHeader.Font = Enum.Font.SourceSansBold otherHeader.Parent = pageOther
+
+local sellBtn = Instance.new("TextButton") sellBtn.Size = UDim2.new(0, 260, 0, 45) sellBtn.Position = UDim2.new(0.5, -130, 0, 55) sellBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113) sellBtn.Text = "Auto Sell" sellBtn.TextColor3 = Color3.fromRGB(255, 255, 255) sellBtn.TextSize = 15 sellBtn.Font = Enum.Font.SourceSansBold sellBtn.Parent = pageMain
+local b1 = Instance.new("UICorner") b1.CornerRadius = UDim.new(0, 8) b1.Parent = sellBtn
+
+local pickupBtn = Instance.new("TextButton") pickupBtn.Size = UDim2.new(0, 260, 0, 45) pickupBtn.Position = UDim2.new(0.5, -130, 0, 115) pickupBtn.BackgroundColor3 = Color3.fromRGB(192, 57, 43) pickupBtn.Text = "Auto Pick Up: OFF" pickupBtn.TextColor3 = Color3.fromRGB(255, 255, 255) pickupBtn.TextSize = 15 pickupBtn.Font = Enum.Font.SourceSansBold pickupBtn.Parent = pageMain
+local b_pickup = Instance.new("UICorner") b_pickup.CornerRadius = UDim.new(0, 8) b_pickup.Parent = pickupBtn
+
+local iyBtn = Instance.new("TextButton") iyBtn.Size = UDim2.new(0, 260, 0, 45) iyBtn.Position = UDim2.new(0.5, -130, 0, 70) iyBtn.BackgroundColor3 = Color3.fromRGB(52, 152, 219) iyBtn.Text = "Open Infinite Yield" iyBtn.TextColor3 = Color3.fromRGB(255, 255, 255) iyBtn.TextSize = 15 iyBtn.Font = Enum.Font.SourceSansBold iyBtn.Parent = pageOther
+local b2 = Instance.new("UICorner") b2.CornerRadius = UDim.new(0, 8) b2.Parent = iyBtn
+
+local dexBtn = Instance.new("TextButton") dexBtn.Size = UDim2.new(0, 260, 0, 45) dexBtn.Position = UDim2.new(0.5, -130, 0, 135) dexBtn.BackgroundColor3 = Color3.fromRGB(155, 89, 182) dexBtn.Text = "Open Dark DEX" dexBtn.TextColor3 = Color3.fromRGB(255, 255, 255) dexBtn.TextSize = 15 dexBtn.Font = Enum.Font.SourceSansBold dexBtn.Parent = pageOther
+local b3 = Instance.new("UICorner") b3.CornerRadius = UDim.new(0, 8) b3.Parent = dexBtn
+tabMainBtn.MouseButton1Click:Connect(function() pageMain.Visible = true; pageOther.Visible = false; tabMainBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35); tabMainBtn.TextColor3 = Color3.fromRGB(255, 255, 255); tabOtherBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 16); tabOtherBtn.TextColor3 = Color3.fromRGB(160, 160, 160) end)
+tabOtherBtn.MouseButton1Click:Connect(function() pageMain.Visible = false; pageOther.Visible = true; tabMainBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 16); tabMainBtn.TextColor3 = Color3.fromRGB(160, 160, 160); tabOtherBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35); tabOtherBtn.TextColor3 = Color3.fromRGB(255, 255, 255) end)
+
+-- Логика Auto Sell
+sellBtn.MouseButton1Click:Connect(function()
+    local character = localPlayer.Character
+    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return end
+    sellBtn.Text = "Синхронизация..."
+    local oldCFrame = rootPart.CFrame
+    local oldCameraType = camera.CameraType
+    local shopPosition = CFrame.new(-40, 29, 1067)
+    rootPart.CFrame = shopPosition
+    camera.CameraType = Enum.CameraType.Scriptable
+    camera.CFrame = shopPosition * CFrame.new(0, 5, 10)
+    task.wait(0.35)
+    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+    if remotes and remotes:FindFirstChild("SellRequest") then remotes.SellRequest:FireServer("all") end
+    task.wait(0.15)
+    rootPart.CFrame = oldCFrame
+    camera.CameraType = oldCameraType
+    sellBtn.Text = "Auto Sell"
+end)
+
+-- Переключатель Auto Pick Up
+local autoPickupActive = false
+
+pickupBtn.MouseButton1Click:Connect(function()
+    autoPickupActive = not autoPickupActive
+    if autoPickupActive then
+        pickupBtn.Text = "Auto Pick Up: ON"
+        pickupBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+    else
+        pickupBtn.Text = "Auto Pick Up: OFF"
+        pickupBtn.BackgroundColor3 = Color3.fromRGB(192, 57, 43)
+    end
+end)
+
+-- БЕЗОПАСНЫЙ СБОРЩИК (С защитой от падения и холода)
+task.spawn(function()
+    while true do
+        task.wait(0.4) -- Оптимальная задержка против античита
+        
+        if autoPickupActive then
+            local character = localPlayer.Character
+            local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+            
+            if rootPart and humanoid then
+                for _, v in ipairs(workspace:GetDescendants()) do
+                    if not autoPickupActive then break end
+                    
+                    if v:IsA("ProximityPrompt") then
+                        local crystal = v.Parent
+                        
+                        if crystal and crystal:IsA("BasePart") and (string.find(crystal.Name, "Crystal") or string.find(crystal.Name, "Ore") or string.find(string.lower(v.ActionText), "pickup")) then
+                            
+                            -- Запоминаем позицию БАЗЫ, чтобы улететь от холода
+                            local safePosition = rootPart.CFrame
+                            
+                            -- Обнуляем скорость падения персонажа (чтобы не было урона физики)
+                            rootPart.Velocity = Vector3.new(0, 0, 0)
+                            
+                            -- Переносим ИДЕАЛЬНО на кристалл (не высоко)
+                            rootPart.CFrame = crystal.CFrame * CFrame.new(0, 0.5, 0)
+                            task.wait(0.12)
+                            
+                            -- Собираем
+                            fireproximityprompt(v)
+                            task.wait(0.1)
+                            
+                            -- МГНОВЕННО возвращаем на безопасную теплую базу
+                            rootPart.CFrame = safePosition
+                            rootPart.Velocity = Vector3.new(0, 0, 0)
+                            
+                            break -- Уходим на проверку следующего кристалла
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- Ссылки на утилиты
+iyBtn.MouseButton1Click:Connect(function()
+    iyBtn.Text = "Загрузка IY..."
+    pcall(function() loadstring(game:HttpGet("https://githubusercontent.com"))() end)
+    task.wait(0.5) iyBtn.Text = "Open Infinite Yield"
+end)
+
+dexBtn.MouseButton1Click:Connect(function()
+    dexBtn.Text = "Загрузка DEX..."
+    pcall(function() loadstring(game:HttpGet("https://github.com"))() end)
+    task.wait(0.5) dexBtn.Text = "Open Dark DEX"
+end)
